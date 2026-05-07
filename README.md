@@ -1,4 +1,4 @@
-# Apartment Management Backend
+# Apartment Management Backend :)
 
 Go backend service for the Apartment Management system.
 
