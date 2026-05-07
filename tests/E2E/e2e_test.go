@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
- 	"github.com/PunMung-66/ApartmentSys/internal/minio"
 	"github.com/PunMung-66/ApartmentSys/controller"
 	"github.com/PunMung-66/ApartmentSys/internal/auth"
 	"github.com/PunMung-66/ApartmentSys/repository"
@@ -28,7 +27,8 @@ func SetupTestRouter() *gin.Engine {
 	userRepo := repository.NewUserRepository(setup.TestDB)
 	roomRepo := repository.NewRoomRepository(setup.TestDB)
 	contractRepo := repository.NewContractRepository(setup.TestDB)
-	billSlipRepo := repository.NewBillSlipRepository(setup.TestDB)
+	utilityRateRepo := repository.NewUtilityRateRepository(setup.TestDB)
+	utilityUsageRepo := repository.NewUtilityUsageRepository(setup.TestDB)
 
 	userService := service.NewUserService(userRepo)
 	roomService := service.NewRoomService(roomRepo, contractRepo)
@@ -36,21 +36,13 @@ func SetupTestRouter() *gin.Engine {
 	authService := service.NewAuthService(userRepo)
 	contractService := service.NewContractService(contractRepo, roomRepo)
 	contractService.SetUserRepository(userRepo)
+	utilityService := service.NewUtilityService(utilityRateRepo, utilityUsageRepo, contractRepo)
 
-	myMinioClient, _ := minio.NewMinioClient(
-			"localhost:9000", // Dummy endpoint
-			"minioadmin",     // Dummy access key
-			"minioadmin",     // Dummy secret
-			"test-bucket",    // Dummy bucket
-			false,
-		)
-    billSlipService := service.NewBillSlipService(billSlipRepo, myMinioClient)
-	
 	userController := controller.NewUserController(userService)
 	roomController := controller.NewRoomController(roomService)
 	contractController := controller.NewContractController(contractService)
 	authController := controller.NewAuthController(authService, secret)
-	billSlipController := controller.NewBillSlipController(billSlipService)
+	utilityController := controller.NewUtilityController(utilityService)
 
 	userRoute := r.Group("/users")
 	{
@@ -85,9 +77,29 @@ func SetupTestRouter() *gin.Engine {
 		contractRoute.GET("/room/:roomID", auth.Protect(secret, "STAFF"), contractController.GetContractsByRoomID)
 	}
 
+	utilityRateRoute := r.Group("/utility-rates")
+	{
+		utilityRateRoute.POST("/", auth.Protect(secret, "STAFF"), utilityController.CreateRate)
+		utilityRateRoute.GET("/", auth.Protect(secret, "STAFF", "TENANT"), utilityController.GetAllRates)
+		utilityRateRoute.GET("/:id", auth.Protect(secret, "STAFF", "TENANT"), utilityController.GetRateByID)
+		utilityRateRoute.PUT("/:id", auth.Protect(secret, "STAFF"), utilityController.UpdateRate)
+		utilityRateRoute.DELETE("/:id", auth.Protect(secret, "STAFF"), utilityController.DeleteRate)
+	}
+
+	utilityUsageRoute := r.Group("/utility-usages")
+	{
+		utilityUsageRoute.POST("/", auth.Protect(secret, "STAFF"), utilityController.RecordUsage)
+		utilityUsageRoute.GET("/contract/:contractID", auth.Protect(secret, "STAFF"), utilityController.GetUsagesByContract)
+		utilityUsageRoute.PUT("/:id", auth.Protect(secret, "STAFF"), utilityController.UpdateUsage)
+		utilityUsageRoute.DELETE("/:id", auth.Protect(secret, "STAFF"), utilityController.DeleteUsage)
+		utilityUsageRoute.GET("/:id", auth.Protect(secret, "STAFF"), utilityController.GetUsageByID)
+	}
+
 	meRoute := r.Group("/me")
 	{
 		meRoute.GET("/room", auth.Protect(secret, "TENANT"), roomController.GetMyRoom)
+		meRoute.GET("/usages", auth.Protect(secret, "TENANT"), utilityController.GetMyUsages)
+		meRoute.GET("/usages/latest", auth.Protect(secret, "TENANT"), utilityController.GetMyLatestUsage)
 	}
 
 	authRoute := r.Group("/auth")
@@ -95,10 +107,6 @@ func SetupTestRouter() *gin.Engine {
 		authRoute.POST("/login", authController.LoginHandler)
 		authRoute.POST("/register", authController.RegisterHandler)
 	}
-	billSlipRoute := r.Group("/billslips")
-    {
-        billSlipRoute.POST("/upload", auth.Protect(secret, "STAFF"), billSlipController.UploadBillSlip)
-    }
 
 	return r
 }

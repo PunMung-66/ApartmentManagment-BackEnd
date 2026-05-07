@@ -20,6 +20,7 @@ jobs:
 
       - name: Create .env
         run: |
+          ls -la
           cat <<EOF > .env
           PORT=8080
           JWT_SECRET=${{ secrets.JWT_SECRET }}
@@ -31,6 +32,8 @@ jobs:
           POSTGRES_USER=${{ secrets.DB_USER }}
           POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
           POSTGRES_DB=${{ secrets.DB_NAME }}
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY=${{ secrets.SUPABASE_SERVICE_KEY }}
           EOF
 
       # ✅ Start ONLY database
