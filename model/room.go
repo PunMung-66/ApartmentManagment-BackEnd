@@ -16,13 +16,12 @@ const (
 )
 
 type Room struct {
-	ID         string         `gorm:"type:char(36);primaryKey" json:"room_id"`
-	RoomNumber string         `json:"room_number" gorm:"not null"`
-	Level      int            `json:"level" gorm:"not null"`
-	Status     string         `json:"status" gorm:"not null;check:status IN ('Available','Occupied','Maintenance')"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	ID         string    `gorm:"type:char(36);primaryKey" json:"room_id"`
+	RoomNumber string    `json:"room_number" gorm:"not null"`
+	Level      int       `json:"level" gorm:"not null"`
+	Status     string    `json:"status" gorm:"not null;check:status IN ('Available','Occupied','Maintenance')"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 func (Room) TableName() string {

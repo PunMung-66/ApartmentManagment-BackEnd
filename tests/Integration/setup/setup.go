@@ -132,7 +132,7 @@ func CleanupUsers(emails []string) {
 		panic("TestDB is nil - database not initialized")
 	}
 	for _, email := range emails {
-		TestDB.Unscoped().Where("email = ?", email).Delete(&model.User{})
+		TestDB.Where("email = ?", email).Delete(&model.User{})
 	}
 }
 
@@ -142,7 +142,7 @@ func CleanupRooms(roomIDs []string) {
 		panic("TestDB is nil - database not initialized")
 	}
 	for _, roomID := range roomIDs {
-		TestDB.Unscoped().Where("id = ?", roomID).Delete(&model.Room{})
+		TestDB.Where("id = ?", roomID).Delete(&model.Room{})
 	}
 }
 
