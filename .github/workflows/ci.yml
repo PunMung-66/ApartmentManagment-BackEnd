@@ -54,8 +54,7 @@ jobs:
 
       # ✅ Run integration tests
       - name: Run tests
-        run: docker compose run --rm app go test ./tests/Integration/service -v
-
+        run: docker compose run --rm app sh -c "go test ./tests/Integration/service -v && go test ./tests/Integration/repository -v"
       # ✅ Cleanup
       - name: Cleanup
         if: always()

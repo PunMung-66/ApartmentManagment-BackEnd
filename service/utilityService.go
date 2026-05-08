@@ -199,10 +199,6 @@ func (s *UtilityService) GetUsageByID(id string) (*model.UtilityUsage, error) {
 		s.usageRepo.Delete(usage)
 		return nil, errors.New("usage not found")
 	}
-	if contract.DeletedAt.Valid {
-		s.usageRepo.Delete(usage)
-		return nil, errors.New("usage not found")
-	}
 	return usage, nil
 }
 
@@ -212,9 +208,6 @@ func (s *UtilityService) GetUsagesByContract(contractID string) ([]model.Utility
 	}
 	contract, err := s.contractRepo.FindContractByID(contractID)
 	if err != nil || contract == nil {
-		return nil, errors.New("contract not found")
-	}
-	if contract.DeletedAt.Valid {
 		return nil, errors.New("contract not found")
 	}
 	return s.usageRepo.FindByContract(contractID)
@@ -232,10 +225,6 @@ func (s *UtilityService) UpdateUsage(id string, req RecordUsageRequest) (*model.
 
 	contract, err := s.contractRepo.FindContractByID(usage.ContractID)
 	if err != nil || contract == nil {
-		s.usageRepo.Delete(usage)
-		return nil, errors.New("usage not found")
-	}
-	if contract.DeletedAt.Valid {
 		s.usageRepo.Delete(usage)
 		return nil, errors.New("usage not found")
 	}

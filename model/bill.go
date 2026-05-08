@@ -26,21 +26,20 @@ type Bill struct {
 	ElectricityFee float64   `json:"electricity_fee" gorm:"type:decimal(10,2);not null"`
 	CommonFee      float64   `json:"common_fee" gorm:"type:decimal(10,2);not null"`
 	TotalAmount    float64   `json:"total_amount" gorm:"type:decimal(10,2);not null"`
-	
+
 	// Status with BR-07 default
-	Status         string    `json:"status" gorm:"not null;default:'Unpaid';check:status IN ('Unpaid','WaitingApproval','Paid','Rejected')"`
-	
-	DueDate        time.Time `json:"due_date" gorm:"type:date;not null"`
-	
+	Status string `json:"status" gorm:"not null;default:'Unpaid';check:status IN ('Unpaid','WaitingApproval','Paid','Rejected')"`
+
+	DueDate time.Time `json:"due_date" gorm:"type:date;not null"`
+
 	// ✅ THE FIX: We map GORM's automatic CreatedAt to your database's "created_date" column
-	CreatedAt      time.Time `json:"created_at" gorm:"column:created_date;not null"`
-	UpdatedAt      time.Time `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_date;not null"`
+	UpdatedAt time.Time `json:"updated_at"`
+
 	// Relations
-	Contract       *Contract    `gorm:"foreignKey:ContractID" json:"-"`
-	UtilityRate    *UtilityRate `gorm:"foreignKey:RateID" json:"-"`
-	BillSlip       *BillSlip    `gorm:"foreignKey:BillID" json:"bill_slip,omitempty"` 
+	Contract    *Contract    `gorm:"foreignKey:ContractID" json:"-"`
+	UtilityRate *UtilityRate `gorm:"foreignKey:RateID" json:"-"`
+	BillSlip    *BillSlip    `gorm:"foreignKey:BillID" json:"bill_slip,omitempty"`
 }
 
 func (Bill) TableName() string {
@@ -76,9 +75,9 @@ func NewBill(contractID, rateID string, recordDate time.Time, rentFee, waterFee,
 		CommonFee:      commonFee,
 		DueDate:        dueDate,
 	}
-	
+
 	// Calculate the total immediately upon creation
 	bill.CalculateTotal()
-	
+
 	return bill
 }

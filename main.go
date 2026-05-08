@@ -73,7 +73,6 @@ func main() {
 			&model.UtilityRate{},
 			&model.UtilityUsage{},
 			&model.Bill{},
-			&model.Payment{},
 			&model.BillSlip{},
 		)
 
