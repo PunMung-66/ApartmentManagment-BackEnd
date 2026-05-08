@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,18 +39,4 @@ func NewUtilityUsage(contractID string, oldWater, newWater, oldElectric, newElec
 		NewElectricUnit: newElectric,
 		RecordDate:      recordDate,
 	}
-}
-
-func (u *UtilityUsage) CalculateWaterUsage() (int, error) {
-	if u.NewWaterUnit < u.OldWaterUnit {
-		return 0, errors.New("BR-12 Violation: New water unit cannot be less than old unit")
-	}
-	return u.NewWaterUnit - u.OldWaterUnit, nil
-}
-
-func (u *UtilityUsage) CalculateElectricUsage() (int, error) {
-	if u.NewElectricUnit < u.OldElectricUnit {
-		return 0, errors.New("BR-12 Violation: New electric unit cannot be less than old unit")
-	}
-	return u.NewElectricUnit - u.OldElectricUnit, nil
 }
