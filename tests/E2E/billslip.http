@@ -1,16 +1,18 @@
 ### ==========================================
-### APARTMENT SYSTEM - BILL SLIP TESTS
+### APARTMENT SYSTEM - BILL SLIP UPLOAD
 ### ==========================================
 
 ### Variables
 @baseUrl = http://localhost:8081
-@staffEmail = staff@test.com
-@staffPassword = staffpass
 @tenantEmail = tenant@test.com
 @tenantPassword = TenantPassword123
 
+# 🚩 PASTE YOUR REAL IDs HERE:
+@billId = 16b7feac-f33e-4ac6-ba6e-4193bb58b345
+@roomId = 550e8400-e29b-41d4-a716-446655440014
+
 ### ==========================================
-### SETUP: LOGIN TENANT (To get token if you protect the route later)
+### SETUP: LOGIN TENANT
 ### ==========================================
 # @name loginTenant
 POST {{baseUrl}}/auth/login
@@ -22,57 +24,26 @@ Content-Type: application/json
 }
 
 ### ==========================================
-### TEST 1: UPLOAD BILL SLIP - SUCCESS
+### TEST 1: UPLOAD BILL SLIP
 ### ==========================================
-# Notice the boundary declaration in the Content-Type header
-# Make sure test-slip.jpg exists in the same folder as this .http file!
+# IMPORTANT: Make sure you have a small image file named "test-slip.jpg" 
+# saved in the exact same folder as this .http file!
 
 POST {{baseUrl}}/billslips/upload
-# Authorization: Bearer {{loginTenant.response.body.data.access_token}} 
-Content-Type: multipart/form-data; boundary=MyBoundaryForTesting
+Authorization: Bearer {{loginTenant.response.body.data.access_token}} 
+Content-Type: multipart/form-data; boundary=MyBoundary
 
---MyBoundaryForTesting
+--MyBoundary
 Content-Disposition: form-data; name="bill_id"
 
-BILL-001
---MyBoundaryForTesting
+{{billId}}
+--MyBoundary
 Content-Disposition: form-data; name="room_id"
 
-ROOM-101
---MyBoundaryForTesting
+{{roomId}}
+--MyBoundary
 Content-Disposition: form-data; name="slip"; filename="test-slip.jpg"
 Content-Type: image/jpeg
 
 < ./test-slip.jpg
---MyBoundaryForTesting--
-
-### ==========================================
-### TEST 2: UPLOAD BILL SLIP - MISSING FILE (SHOULD FAIL)
-### ==========================================
-
-POST {{baseUrl}}/billslips/upload
-Content-Type: multipart/form-data; boundary=MyBoundaryForTesting
-
---MyBoundaryForTesting
-Content-Disposition: form-data; name="bill_id"
-
-BILL-002
---MyBoundaryForTesting
-Content-Disposition: form-data; name="room_id"
-
-ROOM-102
---MyBoundaryForTesting--
-
-### ==========================================
-### TEST 3: UPLOAD BILL SLIP - MISSING ROOM & BILL ID
-### ==========================================
-
-POST {{baseUrl}}/billslips/upload
-Content-Type: multipart/form-data; boundary=MyBoundaryForTesting
-
---MyBoundaryForTesting
-Content-Disposition: form-data; name="slip"; filename="test-slip.jpg"
-Content-Type: image/jpeg
-
-< ./test-slip.jpg
---MyBoundaryForTesting--
+--MyBoundary--
