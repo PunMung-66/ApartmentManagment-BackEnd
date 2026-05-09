@@ -11,13 +11,17 @@ import (
 
 type BillService interface {
 	GenerateMonthlyBill(roomID string, contractID string, recordDate time.Time, dueDate time.Time) (*model.Bill, error)
+	GetAllBills() ([]model.Bill, error)
+	GetBillByID(id string) (*model.Bill, error)
+	UpdateBill(bill *model.Bill) (*model.Bill, error)
+	DeleteBill(billID string) error
 }
 
 type billService struct {
 	billRepo  repository.BillRepository
-	roomRepo  *repository.RoomRepository        
+	roomRepo  *repository.RoomRepository
 	usageRepo *repository.UtilityUsageRepository
-	rateRepo  *repository.UtilityRateRepository  
+	rateRepo  *repository.UtilityRateRepository
 }
 
 func NewBillService(br repository.BillRepository, rr *repository.RoomRepository, ur *repository.UtilityUsageRepository, rate *repository.UtilityRateRepository) BillService {
@@ -27,6 +31,43 @@ func NewBillService(br repository.BillRepository, rr *repository.RoomRepository,
 		usageRepo: ur,
 		rateRepo:  rate,
 	}
+}
+
+func (s *billService) GetAllBills() ([]model.Bill, error) {
+	return s.billRepo.FindAll()
+}
+
+func (s *billService) GetBillByID(id string) (*model.Bill, error) {
+	bill, err := s.billRepo.FindByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("bill not found: %w", err)
+	}
+	return bill, nil
+}
+
+func (s *billService) UpdateBill(bill *model.Bill) (*model.Bill, error) {
+	existing, err := s.billRepo.FindByID(bill.ID)
+	if err != nil {
+		return nil, fmt.Errorf("bill not found: %w", err)
+	}
+
+	if bill.Status != "" {
+		existing.Status = bill.Status
+	}
+
+	if err := s.billRepo.Update(existing); err != nil {
+		return nil, fmt.Errorf("failed to update bill: %w", err)
+	}
+
+	return existing, nil
+}
+
+func (s *billService) DeleteBill(billID string) error {
+	_, err := s.billRepo.FindByID(billID)
+	if err != nil {
+		return fmt.Errorf("bill not found: %w", err)
+	}
+	return s.billRepo.Delete(billID)
 }
 
 func (s *billService) GenerateMonthlyBill(roomID string, contractID string, recordDate time.Time, dueDate time.Time) (*model.Bill, error) {
@@ -66,7 +107,7 @@ func (s *billService) GenerateMonthlyBill(roomID string, contractID string, reco
 
 	// 5. Creator: Construct the Bill
 	newBill := model.NewBill(
-		contractID, 
+		contractID,
 		rate.ID,
 		recordDate,
 		3000, // Rent fee (Update later if needed)

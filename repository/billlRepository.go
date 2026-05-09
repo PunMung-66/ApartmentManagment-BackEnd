@@ -8,6 +8,9 @@ import (
 type BillRepository interface {
 	Create(bill *model.Bill) error
 	FindByID(id string) (*model.Bill, error)
+	FindAll() ([]model.Bill, error)
+	Update(bill *model.Bill) error
+	Delete(billID string) error
 }
 
 type billRepository struct {
@@ -31,4 +34,21 @@ func (r *billRepository) FindByID(id string) (*model.Bill, error) {
 		return nil, err
 	}
 	return &bill, nil
+}
+
+func (r *billRepository) FindAll() ([]model.Bill, error) {
+	var bills []model.Bill
+	err := r.db.Preload("BillSlip").Order("created_date desc").Find(&bills).Error
+	if err != nil {
+		return nil, err
+	}
+	return bills, nil
+}
+
+func (r *billRepository) Update(bill *model.Bill) error {
+	return r.db.Save(bill).Error
+}
+
+func (r *billRepository) Delete(billID string) error {
+	return r.db.Where("id = ?", billID).Delete(&model.Bill{}).Error
 }
