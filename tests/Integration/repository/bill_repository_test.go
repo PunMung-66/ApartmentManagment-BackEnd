@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -19,7 +20,8 @@ func init() {
 
 func createTestBill(t *testing.T) *model.Bill {
 	t.Helper()
-	user := model.NewUser("Bill Tenant", "9999999999", "billtenant@test.com", "password123", "TENANT")
+	email := fmt.Sprintf("billtenant-%d@test.com", time.Now().UnixNano())
+	user := model.NewUser("Bill Tenant", "9999999999", email, "password123", "TENANT")
 	createdUser, err := setup.UserRepo.CreateUser(user)
 	require.NoError(t, err)
 

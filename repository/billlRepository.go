@@ -38,7 +38,7 @@ func (r *billRepository) FindByID(id string) (*model.Bill, error) {
 
 func (r *billRepository) FindAll() ([]model.Bill, error) {
 	var bills []model.Bill
-	err := r.db.Order("created_at desc").Find(&bills).Error
+	err := r.db.Preload("BillSlip").Order("created_date desc").Find(&bills).Error
 	if err != nil {
 		return nil, err
 	}

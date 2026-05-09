@@ -101,6 +101,7 @@ func InitTestDatabase() {
 	db.AutoMigrate(&model.UtilityRate{})
 	db.AutoMigrate(&model.UtilityUsage{})
 	db.AutoMigrate(&model.Bill{})
+	db.AutoMigrate(&model.BillSlip{})
 
 	TestDB = db
 	UserRepo = repository.NewUserRepository(TestDB)
@@ -118,6 +119,7 @@ func InitTestDatabase() {
 // ResetTestDB clears all test data
 func ResetTestDB() {
 	if TestDB != nil {
+		TestDB.Exec("TRUNCATE TABLE bill_slips CASCADE")
 		TestDB.Exec("TRUNCATE TABLE bills CASCADE")
 		TestDB.Exec("TRUNCATE TABLE utility_usages CASCADE")
 		TestDB.Exec("TRUNCATE TABLE utility_rates CASCADE")
@@ -130,6 +132,7 @@ func ResetTestDB() {
 // TeardownTestDB closes the database connection
 func TeardownTestDB() {
 	if TestDB != nil {
+		TestDB.Exec("TRUNCATE TABLE bill_slips CASCADE")
 		TestDB.Exec("TRUNCATE TABLE bills CASCADE")
 		TestDB.Exec("TRUNCATE TABLE utility_usages CASCADE")
 		TestDB.Exec("TRUNCATE TABLE utility_rates CASCADE")

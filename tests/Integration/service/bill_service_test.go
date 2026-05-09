@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -13,7 +14,8 @@ import (
 func createTestBillForService(t *testing.T) *model.Bill {
 	t.Helper()
 
-	user := model.NewUser("Bill Svc", "8888888888", "billsvc@test.com", "password123", "TENANT")
+	email := fmt.Sprintf("billsvc-%d@test.com", time.Now().UnixNano())
+	user := model.NewUser("Bill Svc", "8888888888", email, "password123", "TENANT")
 	createdUser, err := setup.UserRepo.CreateUser(user)
 	require.NoError(t, err)
 
