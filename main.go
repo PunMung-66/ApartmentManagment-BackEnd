@@ -152,18 +152,19 @@ func main() {
 	utilityUsageRoute := r.Group("/utility-usages")
 	{
 		utilityUsageRoute.POST("", auth.Protect([]byte(secret), "STAFF"), utilityController.RecordUsage)
+		utilityUsageRoute.GET("", auth.Protect([]byte(secret), "STAFF"), utilityController.GetAllUsages)
 		utilityUsageRoute.GET("/contract/:contractID", auth.Protect([]byte(secret), "STAFF"), utilityController.GetUsagesByContract)
 		utilityUsageRoute.PUT("/:id", auth.Protect([]byte(secret), "STAFF"), utilityController.UpdateUsage)
 		utilityUsageRoute.DELETE("/:id", auth.Protect([]byte(secret), "STAFF"), utilityController.DeleteUsage)
 		utilityUsageRoute.GET("/:id", auth.Protect([]byte(secret), "STAFF"), utilityController.GetUsageByID)
 	}
 
-// ================= BILL =================
+	// ================= BILL =================
 	billRepo := repository.NewBillRepository(db)
 
 	// Updated to NewBillService
 	billService := service.NewBillService(billRepo, roomRepo, utilityRepo, utilityRateRepo)
-	
+
 	// Updated to NewBillController
 	billController := controller.NewBillController(billService)
 
@@ -183,8 +184,8 @@ func main() {
 	storageClient := storage.NewSupabaseStorage(supabaseURL, supabaseKey)
 
 	billSlipRepo := repository.NewBillSlipRepository(db)
-	
-	// ✅ UPDATED: We now pass the `billRepo` into the BillSlipService so it can 
+
+	// ✅ UPDATED: We now pass the `billRepo` into the BillSlipService so it can
 	// check if a bill exists BEFORE it uploads to Supabase!
 	billSlipService := service.NewBillSlipService(billSlipRepo, billRepo, storageClient)
 	billSlipController := controller.NewBillSlipController(billSlipService)

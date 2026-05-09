@@ -18,6 +18,7 @@ type UtilityUsageRepositoryInterface interface {
 	FindByID(id string) (*model.UtilityUsage, error)
 	FindByContract(contractID string) ([]model.UtilityUsage, error)
 	FindLatestByContract(contractID string) (*model.UtilityUsage, error)
+	FindAll() ([]model.UtilityUsage, error)
 }
 
 func NewUtilityUsageRepository(db *gorm.DB) *UtilityUsageRepository {
@@ -70,4 +71,13 @@ func (r *UtilityUsageRepository) FindLatestByContract(contractID string) (*model
 		return nil, result.Error
 	}
 	return &usage, nil
+}
+
+func (r *UtilityUsageRepository) FindAll() ([]model.UtilityUsage, error) {
+	var usages []model.UtilityUsage
+	result := r.db.Order("record_date desc").Find(&usages)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return usages, nil
 }

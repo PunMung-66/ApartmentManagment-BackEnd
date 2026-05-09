@@ -202,6 +202,10 @@ func (s *UtilityService) GetUsageByID(id string) (*model.UtilityUsage, error) {
 	return usage, nil
 }
 
+func (s *UtilityService) GetAllUsages() ([]model.UtilityUsage, error) {
+	return s.usageRepo.FindAll()
+}
+
 func (s *UtilityService) GetUsagesByContract(contractID string) ([]model.UtilityUsage, error) {
 	if contractID == "" {
 		return nil, errors.New("contract id is required")
