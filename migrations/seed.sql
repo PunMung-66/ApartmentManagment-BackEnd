@@ -138,38 +138,3 @@ INSERT INTO utility_usages (id, contract_id, old_water_unit, new_water_unit, old
   NOW(),
   NOW()
 );
-
--- Insert Bills (Optional - for reference)
-INSERT INTO bills (id, contract_id, rate_id, record_date, rent_fee, water_fee, electricity_fee, common_fee, total_amount, status, due_date, created_date, created_at, updated_at) VALUES
-(
-  '550e8400-e29b-41d4-a716-446655440050',
-  '550e8400-e29b-41d4-a716-446655440030',
-  '550e8400-e29b-41d4-a716-446655440020',
-  '2024-01-31'::date,
-  2500000.00,
-  137.50,
-  487.50,
-  150.00,
-  3275.00,
-  'Unpaid',
-  '2024-02-14'::date,
-  '2024-02-01'::date,
-  NOW(),
-  NOW()
-),
-(
-  '550e8400-e29b-41d4-a716-446655440051',
-  '550e8400-e29b-41d4-a716-446655440031',
-  '550e8400-e29b-41d4-a716-446655440020',
-  '2024-01-31'::date,
-  3000000.00,
-  165.00,
-  586.63,
-  150.00,
-  3901.63,
-  'Unpaid',
-  '2024-02-14'::date,
-  '2024-02-01'::date,
-  NOW(),
-  NOW()
-);

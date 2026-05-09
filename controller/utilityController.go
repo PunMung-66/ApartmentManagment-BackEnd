@@ -21,6 +21,7 @@ type UtilityControllerInterface interface {
 	DeleteRate(c *gin.Context)
 	RecordUsage(c *gin.Context)
 	GetUsageByID(c *gin.Context)
+	GetAllUsages(c *gin.Context)
 	GetUsagesByContract(c *gin.Context)
 	UpdateUsage(c *gin.Context)
 	DeleteUsage(c *gin.Context)
@@ -328,6 +329,26 @@ func (uc *UtilityController) GetUsageByID(c *gin.Context) {
 		http.StatusOK,
 		"Usage retrieved successfully",
 		usage,
+	)
+	c.JSON(appRes.Status, appRes.Response())
+}
+
+func (uc *UtilityController) GetAllUsages(c *gin.Context) {
+	usages, err := uc.utilityService.GetAllUsages()
+	if err != nil {
+		appErr := response.NewAppResponse(
+			http.StatusInternalServerError,
+			"Failed to retrieve usages",
+			err.Error(),
+		)
+		c.JSON(appErr.Status, appErr.Response())
+		return
+	}
+
+	appRes := response.NewAppResponse(
+		http.StatusOK,
+		"Usages retrieved successfully",
+		usages,
 	)
 	c.JSON(appRes.Status, appRes.Response())
 }
