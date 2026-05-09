@@ -171,6 +171,10 @@ func main() {
 	billRoute := r.Group("/bills")
 	{
 		billRoute.POST("/generate", auth.Protect([]byte(secret), "STAFF"), billController.GenerateBill)
+		billRoute.GET("", auth.Protect([]byte(secret), "STAFF"), billController.GetBills)
+		billRoute.GET("/:id", auth.Protect([]byte(secret), "STAFF"), billController.GetBillByID)
+		billRoute.PUT("/:id", auth.Protect([]byte(secret), "STAFF"), billController.UpdateBill)
+		billRoute.DELETE("/:id", auth.Protect([]byte(secret), "STAFF"), billController.DeleteBill)
 	}
 
 	// ================= BILL SLIP (Supabase) =================

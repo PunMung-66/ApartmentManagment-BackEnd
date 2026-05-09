@@ -29,14 +29,18 @@ type (
 )
 
 var (
-	TestDB       *gorm.DB
-	UserRepo     *repository.UserRepository
-	RoomRepo     *repository.RoomRepository
-	ContractRepo *repository.ContractRepository
-	AuthService  *service.AuthService
-	UserService  *service.UserService
-	RoomService  *service.RoomService
-	Env          string
+	TestDB           *gorm.DB
+	UserRepo         *repository.UserRepository
+	RoomRepo         *repository.RoomRepository
+	ContractRepo     *repository.ContractRepository
+	BillRepo         repository.BillRepository
+	UtilityRateRepo  *repository.UtilityRateRepository
+	UtilityUsageRepo *repository.UtilityUsageRepository
+	AuthService      *service.AuthService
+	UserService      *service.UserService
+	RoomService      *service.RoomService
+	BillService      service.BillService
+	Env              string
 )
 
 func init() {
@@ -94,19 +98,29 @@ func InitTestDatabase() {
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Room{})
 	db.AutoMigrate(&model.Contract{})
+	db.AutoMigrate(&model.UtilityRate{})
+	db.AutoMigrate(&model.UtilityUsage{})
+	db.AutoMigrate(&model.Bill{})
 
 	TestDB = db
 	UserRepo = repository.NewUserRepository(TestDB)
 	RoomRepo = repository.NewRoomRepository(TestDB)
 	ContractRepo = repository.NewContractRepository(TestDB)
+	BillRepo = repository.NewBillRepository(TestDB)
+	UtilityRateRepo = repository.NewUtilityRateRepository(TestDB)
+	UtilityUsageRepo = repository.NewUtilityUsageRepository(TestDB)
 	AuthService = service.NewAuthService(UserRepo)
 	UserService = service.NewUserService(UserRepo)
 	RoomService = service.NewRoomService(RoomRepo, ContractRepo)
+	BillService = service.NewBillService(BillRepo, RoomRepo, UtilityUsageRepo, UtilityRateRepo)
 }
 
 // ResetTestDB clears all test data
 func ResetTestDB() {
 	if TestDB != nil {
+		TestDB.Exec("TRUNCATE TABLE bills CASCADE")
+		TestDB.Exec("TRUNCATE TABLE utility_usages CASCADE")
+		TestDB.Exec("TRUNCATE TABLE utility_rates CASCADE")
 		TestDB.Exec("TRUNCATE TABLE contracts CASCADE")
 		TestDB.Exec("TRUNCATE TABLE rooms CASCADE")
 		TestDB.Exec("TRUNCATE TABLE users CASCADE")
@@ -116,6 +130,9 @@ func ResetTestDB() {
 // TeardownTestDB closes the database connection
 func TeardownTestDB() {
 	if TestDB != nil {
+		TestDB.Exec("TRUNCATE TABLE bills CASCADE")
+		TestDB.Exec("TRUNCATE TABLE utility_usages CASCADE")
+		TestDB.Exec("TRUNCATE TABLE utility_rates CASCADE")
 		TestDB.Exec("TRUNCATE TABLE contracts CASCADE")
 		TestDB.Exec("TRUNCATE TABLE rooms CASCADE")
 		TestDB.Exec("TRUNCATE TABLE users CASCADE")
