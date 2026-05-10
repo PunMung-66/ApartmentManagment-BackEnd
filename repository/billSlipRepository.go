@@ -16,3 +16,7 @@ func NewBillSlipRepository(db *gorm.DB) *BillSlipRepository {
 func (r *BillSlipRepository) CreateBillSlip(slip *model.BillSlip) error {
 	return r.db.Create(slip).Error
 }
+
+func (r *BillSlipRepository) DeleteByBillID(billID string) error {
+	return r.db.Where("bill_id = ?", billID).Delete(&model.BillSlip{}).Error
+}

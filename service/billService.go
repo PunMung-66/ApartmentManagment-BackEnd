@@ -20,15 +20,17 @@ type BillService interface {
 
 type billService struct {
 	billRepo     repository.BillRepository
+	billSlipRepo *repository.BillSlipRepository
 	contractRepo *repository.ContractRepository
 	roomRepo     *repository.RoomRepository
 	usageRepo    *repository.UtilityUsageRepository
 	rateRepo     *repository.UtilityRateRepository
 }
 
-func NewBillService(br repository.BillRepository, cr *repository.ContractRepository, rr *repository.RoomRepository, ur *repository.UtilityUsageRepository, rate *repository.UtilityRateRepository) BillService {
+func NewBillService(br repository.BillRepository, bsr *repository.BillSlipRepository, cr *repository.ContractRepository, rr *repository.RoomRepository, ur *repository.UtilityUsageRepository, rate *repository.UtilityRateRepository) BillService {
 	return &billService{
 		billRepo:     br,
+		billSlipRepo: bsr,
 		contractRepo: cr,
 		roomRepo:     rr,
 		usageRepo:    ur,
@@ -85,6 +87,12 @@ func (s *billService) DeleteBill(billID string) error {
 	if err != nil {
 		return fmt.Errorf("bill not found: %w", err)
 	}
+
+	// Delete associated bill slip first to avoid FK constraint violation
+	if err := s.billSlipRepo.DeleteByBillID(billID); err != nil {
+		return fmt.Errorf("failed to delete bill slip: %w", err)
+	}
+
 	return s.billRepo.Delete(billID)
 }
 
