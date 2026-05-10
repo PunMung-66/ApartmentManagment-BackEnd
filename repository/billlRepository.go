@@ -9,6 +9,7 @@ type BillRepository interface {
 	Create(bill *model.Bill) error
 	FindByID(id string) (*model.Bill, error)
 	FindAll() ([]model.Bill, error)
+	FindByContractIDs(contractIDs []string) ([]model.Bill, error)
 	Update(bill *model.Bill) error
 	Delete(billID string) error
 }
@@ -39,6 +40,15 @@ func (r *billRepository) FindByID(id string) (*model.Bill, error) {
 func (r *billRepository) FindAll() ([]model.Bill, error) {
 	var bills []model.Bill
 	err := r.db.Preload("BillSlip").Order("created_date desc").Find(&bills).Error
+	if err != nil {
+		return nil, err
+	}
+	return bills, nil
+}
+
+func (r *billRepository) FindByContractIDs(contractIDs []string) ([]model.Bill, error) {
+	var bills []model.Bill
+	err := r.db.Preload("BillSlip").Where("contract_id IN ?", contractIDs).Order("created_date desc").Find(&bills).Error
 	if err != nil {
 		return nil, err
 	}

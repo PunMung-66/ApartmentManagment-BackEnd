@@ -63,6 +63,25 @@ func (ctrl *BillController) GenerateBill(c *gin.Context) {
 	})
 }
 
+func (ctrl *BillController) GetMyBills(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		res := response.NewAppResponse(http.StatusUnauthorized, "Unauthorized", nil)
+		c.JSON(res.Status, res.Response())
+		return
+	}
+
+	bills, err := ctrl.billService.GetBillsByUserID(userID.(string))
+	if err != nil {
+		res := response.NewAppResponse(http.StatusNotFound, "Failed to retrieve bills", nil)
+		c.JSON(res.Status, res.Response())
+		return
+	}
+
+	res := response.NewAppResponse(http.StatusOK, "Bills retrieved successfully", bills)
+	c.JSON(res.Status, res.Response())
+}
+
 func (ctrl *BillController) GetBills(c *gin.Context) {
 	bills, err := ctrl.billService.GetAllBills()
 	if err != nil {
