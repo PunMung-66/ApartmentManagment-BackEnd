@@ -27,6 +27,16 @@ type Bill struct {
 	CommonFee      float64   `json:"common_fee" gorm:"type:decimal(10,2);not null"`
 	TotalAmount    float64   `json:"total_amount" gorm:"type:decimal(10,2);not null"`
 
+	// Usage details
+	OldWaterUnit    int `json:"old_water_unit" gorm:"not null;default:0"`
+	NewWaterUnit    int `json:"new_water_unit" gorm:"not null;default:0"`
+	OldElectricUnit int `json:"old_electric_unit" gorm:"not null;default:0"`
+	NewElectricUnit int `json:"new_electric_unit" gorm:"not null;default:0"`
+
+	// Rate details at time of billing
+	WaterRate    float64 `json:"water_rate" gorm:"type:decimal(10,2);not null;default:0"`
+	ElectricRate float64 `json:"electric_rate" gorm:"type:decimal(10,2);not null;default:0"`
+
 	// Status with BR-07 default
 	Status string `json:"status" gorm:"not null;default:'Unpaid';check:status IN ('Unpaid','WaitingApproval','Paid','Rejected')"`
 
@@ -64,16 +74,22 @@ func (b *Bill) CalculateTotal() {
 }
 
 // NewBill Constructor
-func NewBill(contractID, rateID string, recordDate time.Time, rentFee, waterFee, electricityFee, commonFee float64, dueDate time.Time) *Bill {
+func NewBill(contractID, rateID string, recordDate time.Time, rentFee, waterFee, electricityFee, commonFee float64, dueDate time.Time, oldWater, newWater, oldElectric, newElectric int, waterRate, electricRate float64) *Bill {
 	bill := &Bill{
-		ContractID:     contractID,
-		RateID:         rateID,
-		RecordDate:     recordDate,
-		RentFee:        rentFee,
-		WaterFee:       waterFee,
-		ElectricityFee: electricityFee,
-		CommonFee:      commonFee,
-		DueDate:        dueDate,
+		ContractID:      contractID,
+		RateID:          rateID,
+		RecordDate:      recordDate,
+		RentFee:         rentFee,
+		WaterFee:        waterFee,
+		ElectricityFee:  electricityFee,
+		CommonFee:       commonFee,
+		DueDate:         dueDate,
+		OldWaterUnit:    oldWater,
+		NewWaterUnit:    newWater,
+		OldElectricUnit: oldElectric,
+		NewElectricUnit: newElectric,
+		WaterRate:       waterRate,
+		ElectricRate:    electricRate,
 	}
 
 	// Calculate the total immediately upon creation
