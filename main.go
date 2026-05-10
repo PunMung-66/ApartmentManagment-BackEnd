@@ -163,7 +163,7 @@ func main() {
 	billRepo := repository.NewBillRepository(db)
 
 	// Updated to NewBillService
-	billService := service.NewBillService(billRepo, roomRepo, utilityRepo, utilityRateRepo)
+	billService := service.NewBillService(billRepo, contractRepo, roomRepo, utilityRepo, utilityRateRepo)
 
 	// Updated to NewBillController
 	billController := controller.NewBillController(billService)
@@ -204,6 +204,7 @@ func main() {
 	meRoute := r.Group("/me")
 	{
 		meRoute.GET("/room", auth.Protect([]byte(secret), "TENANT"), roomController.GetMyRoom)
+		meRoute.GET("/bills", auth.Protect([]byte(secret), "TENANT"), billController.GetMyBills)
 		meRoute.GET("/usages", auth.Protect([]byte(secret), "TENANT"), utilityController.GetMyUsages)
 		meRoute.GET("/usages/latest", auth.Protect([]byte(secret), "TENANT"), utilityController.GetMyLatestUsage)
 	}

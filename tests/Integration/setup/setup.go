@@ -113,7 +113,7 @@ func InitTestDatabase() {
 	AuthService = service.NewAuthService(UserRepo)
 	UserService = service.NewUserService(UserRepo)
 	RoomService = service.NewRoomService(RoomRepo, ContractRepo)
-	BillService = service.NewBillService(BillRepo, RoomRepo, UtilityUsageRepo, UtilityRateRepo)
+	BillService = service.NewBillService(BillRepo, ContractRepo, RoomRepo, UtilityUsageRepo, UtilityRateRepo)
 }
 
 // ResetTestDB clears all test data

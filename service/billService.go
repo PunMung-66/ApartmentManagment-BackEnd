@@ -13,23 +13,26 @@ type BillService interface {
 	GenerateMonthlyBill(roomID string, contractID string, recordDate time.Time, dueDate time.Time) (*model.Bill, error)
 	GetAllBills() ([]model.Bill, error)
 	GetBillByID(id string) (*model.Bill, error)
+	GetBillsByUserID(userID string) ([]model.Bill, error)
 	UpdateBill(bill *model.Bill) (*model.Bill, error)
 	DeleteBill(billID string) error
 }
 
 type billService struct {
-	billRepo  repository.BillRepository
-	roomRepo  *repository.RoomRepository
-	usageRepo *repository.UtilityUsageRepository
-	rateRepo  *repository.UtilityRateRepository
+	billRepo     repository.BillRepository
+	contractRepo *repository.ContractRepository
+	roomRepo     *repository.RoomRepository
+	usageRepo    *repository.UtilityUsageRepository
+	rateRepo     *repository.UtilityRateRepository
 }
 
-func NewBillService(br repository.BillRepository, rr *repository.RoomRepository, ur *repository.UtilityUsageRepository, rate *repository.UtilityRateRepository) BillService {
+func NewBillService(br repository.BillRepository, cr *repository.ContractRepository, rr *repository.RoomRepository, ur *repository.UtilityUsageRepository, rate *repository.UtilityRateRepository) BillService {
 	return &billService{
-		billRepo:  br,
-		roomRepo:  rr,
-		usageRepo: ur,
-		rateRepo:  rate,
+		billRepo:     br,
+		contractRepo: cr,
+		roomRepo:     rr,
+		usageRepo:    ur,
+		rateRepo:     rate,
 	}
 }
 
@@ -43,6 +46,21 @@ func (s *billService) GetBillByID(id string) (*model.Bill, error) {
 		return nil, fmt.Errorf("bill not found: %w", err)
 	}
 	return bill, nil
+}
+
+func (s *billService) GetBillsByUserID(userID string) ([]model.Bill, error) {
+	contracts, err := s.contractRepo.FindContractsByUserID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("no contracts found for user: %w", err)
+	}
+	var contractIDs []string
+	for _, c := range contracts {
+		contractIDs = append(contractIDs, c.ID)
+	}
+	if len(contractIDs) == 0 {
+		return []model.Bill{}, nil
+	}
+	return s.billRepo.FindByContractIDs(contractIDs)
 }
 
 func (s *billService) UpdateBill(bill *model.Bill) (*model.Bill, error) {
