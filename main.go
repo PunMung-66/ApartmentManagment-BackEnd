@@ -161,9 +161,10 @@ func main() {
 
 	// ================= BILL =================
 	billRepo := repository.NewBillRepository(db)
+	billSlipRepo := repository.NewBillSlipRepository(db)
 
 	// Updated to NewBillService
-	billService := service.NewBillService(billRepo, contractRepo, roomRepo, utilityRepo, utilityRateRepo)
+	billService := service.NewBillService(billRepo, billSlipRepo, contractRepo, roomRepo, utilityRepo, utilityRateRepo)
 
 	// Updated to NewBillController
 	billController := controller.NewBillController(billService)
@@ -186,8 +187,6 @@ func main() {
 		fmt.Println("Supabase Key loaded successfully!")
 	}
 	storageClient := storage.NewSupabaseStorage(supabaseURL, supabaseKey)
-
-	billSlipRepo := repository.NewBillSlipRepository(db)
 
 	// ✅ UPDATED: We now pass the `billRepo` into the BillSlipService so it can
 	// check if a bill exists BEFORE it uploads to Supabase!

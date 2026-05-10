@@ -34,6 +34,7 @@ var (
 	RoomRepo         *repository.RoomRepository
 	ContractRepo     *repository.ContractRepository
 	BillRepo         repository.BillRepository
+	BillSlipRepo     *repository.BillSlipRepository
 	UtilityRateRepo  *repository.UtilityRateRepository
 	UtilityUsageRepo *repository.UtilityUsageRepository
 	AuthService      *service.AuthService
@@ -108,12 +109,13 @@ func InitTestDatabase() {
 	RoomRepo = repository.NewRoomRepository(TestDB)
 	ContractRepo = repository.NewContractRepository(TestDB)
 	BillRepo = repository.NewBillRepository(TestDB)
+	BillSlipRepo = repository.NewBillSlipRepository(TestDB)
 	UtilityRateRepo = repository.NewUtilityRateRepository(TestDB)
 	UtilityUsageRepo = repository.NewUtilityUsageRepository(TestDB)
 	AuthService = service.NewAuthService(UserRepo)
 	UserService = service.NewUserService(UserRepo)
 	RoomService = service.NewRoomService(RoomRepo, ContractRepo)
-	BillService = service.NewBillService(BillRepo, ContractRepo, RoomRepo, UtilityUsageRepo, UtilityRateRepo)
+	BillService = service.NewBillService(BillRepo, BillSlipRepo, ContractRepo, RoomRepo, UtilityUsageRepo, UtilityRateRepo)
 }
 
 // ResetTestDB clears all test data
