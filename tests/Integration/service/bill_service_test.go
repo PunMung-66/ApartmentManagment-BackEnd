@@ -42,6 +42,10 @@ func createTestBillForService(t *testing.T) *model.Bill {
 		350.0,
 		500.0,
 		time.Now().AddDate(0, 0, 30),
+		10, 15, // Old/New Water Units
+		20, 25, // Old/New Electric Units
+		rate.WaterRate,
+		rate.ElectricRate,
 	)
 	err = setup.BillRepo.Create(bill)
 	require.NoError(t, err)

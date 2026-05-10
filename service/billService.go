@@ -105,7 +105,7 @@ func (s *billService) GenerateMonthlyBill(roomID string, contractID string, reco
 	waterFee := float64(waterUnits) * rate.WaterRate
 	electricFee := float64(electricUnits) * rate.ElectricRate
 
-	// 5. Creator: Construct the Bill
+	// 5. Creator: Construct the Bill with usage and rate details
 	newBill := model.NewBill(
 		contractID,
 		rate.ID,
@@ -115,6 +115,12 @@ func (s *billService) GenerateMonthlyBill(roomID string, contractID string, reco
 		electricFee,
 		rate.CommonFee,
 		dueDate,
+		usage.OldWaterUnit,
+		usage.NewWaterUnit,
+		usage.OldElectricUnit,
+		usage.NewElectricUnit,
+		rate.WaterRate,
+		rate.ElectricRate,
 	)
 
 	// 6. Save to Database

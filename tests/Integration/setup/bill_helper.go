@@ -10,17 +10,21 @@ import (
 func CreateTestBill(userID string, roomID string) *model.Bill {
 	// For simplicity, create a contract first using the real userID
 	contract, _ := CreateTestContract(userID, roomID, time.Now().Format("2006-01-02"), time.Now().AddDate(0, 6, 0).Format("2006-01-02"), "Active")
-	
+
 	// Create the bill using exactly the 8 required arguments
 	bill := model.NewBill(
-		contract.ID,                  // 1. Contract ID
-		"test-rate-id",               // 2. Rate ID
-		time.Now(),                   // 3. Record Date
-		1000,                         // 4. Rent Fee
-		100,                          // 5. Water Fee
-		100,                          // 6. Electricity Fee
-		50,                           // 7. Common Fee
-		time.Now().AddDate(0, 0, 30), // 8. Due Date
+		contract.ID,                  // Contract ID
+		"test-rate-id",               // Rate ID
+		time.Now(),                   // Record Date
+		1000,                         // Rent Fee
+		100,                          // Water Fee
+		100,                          // Electricity Fee
+		50,                           // Common Fee
+		time.Now().AddDate(0, 0, 30), // Due Date
+		0, 0,                         // Old/New Water Units
+		0, 0, // Old/New Electric Units
+		0, // Water Rate
+		0, // Electric Rate
 	)
 
 	// We no longer assign bill.RoomID here because we removed it from the model!
